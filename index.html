@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>After-Hours Drinks — Financial Model</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:        #0a0a0a;
+    --bg2:       #111111;
+    --bg3:       #1a1a1a;
+    --bg4:       #222222;
+    --text:      #ffffff;
+    --text2:     #a1a1aa;
+    --text3:     #52525b;
+    --border:    rgba(255,255,255,0.07);
+    --border2:   rgba(255,255,255,0.13);
+    --green:     #22c55e;
+    --green-bg:  rgba(34,197,94,0.08);
+    --green-bdr: rgba(34,197,94,0.25);
+    --red:       #ef4444;
+    --amber:     #f59e0b;
+    --amber-bg:  rgba(245,158,11,0.08);
+    --amber-bdr: rgba(245,158,11,0.25);
+    --blue:      #60a5fa;
+    --blue-bg:   rgba(96,165,250,0.08);
+    --blue-bdr:  rgba(96,165,250,0.25);
+    --radius:    8px;
+    --radius-lg: 12px;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .page { max-width: 980px; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+  header { margin-bottom: 2.5rem; padding-bottom: 1.75rem; border-bottom: 0.5px solid var(--border2); }
+  .header-tag { display: inline-block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green); background: var(--green-bg); border: 0.5px solid var(--green-bdr); border-radius: 99px; padding: 3px 12px; margin-bottom: 12px; }
+  h1 { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -0.03em; }
+  .subtitle { font-size: 13px; color: var(--text2); margin-top: 6px; line-height: 1.6; }
+  .tabs { display: flex; gap: 3px; margin-bottom: 2rem; flex-wrap: wrap; background: var(--bg2); border: 0.5px solid var(--border2); border-radius: var(--radius-lg); padding: 4px; width: fit-content; max-width: 100%; }
+  .tab { padding: 7px 15px; border-radius: var(--radius); border: none; background: transparent; font-size: 13px; color: var(--text2); cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+  .tab:hover { color: var(--text); }
+  .tab.active { background: var(--bg3); color: var(--text); font-weight: 500; border: 0.5px solid var(--border2); }
+  .panel { display: none; }
+  .panel.visible { display: block; }
+  .section-title { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px,1fr)); gap: 10px; margin-bottom: 2rem; }
+  .metric { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px; }
+  .metric-label { font-size: 11px; color: var(--text3); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .metric-value { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+  .metric-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .chart-wrap { position: relative; width: 100%; margin-bottom: 2rem; background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; }
+  .scenario-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+  .sc-card { border-radius: var(--radius-lg); padding: 1.25rem; border: 0.5px solid; }
+  .sc-card.conservative { background: var(--blue-bg);  border-color: var(--blue-bdr); }
+  .sc-card.base         { background: var(--green-bg); border-color: var(--green-bdr); }
+  .sc-card.aggressive   { background: var(--amber-bg); border-color: var(--amber-bdr); }
+  .sc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .conservative .sc-label { color: var(--blue); }
+  .base         .sc-label { color: var(--green); }
+  .aggressive   .sc-label { color: var(--amber); }
+  .sc-val { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+  .sc-sub { font-size: 11px; color: var(--text2); margin-top: 3px; }
+  .sc-divider { border-top: 0.5px solid rgba(255,255,255,0.07); margin: 10px 0; }
+  .sc-milestone { font-size: 11px; font-weight: 600; color: var(--green); margin-top: 6px; }
+  .sc-milestone.miss { color: var(--text3); }
+  .stog { padding: 6px 14px; border-radius: var(--radius); border: 0.5px solid var(--border2); font-size: 12px; cursor: pointer; font-family: inherit; background: transparent; color: var(--text2); transition: all 0.15s; }
+  .stog:hover { color: var(--text); }
+  .stog.conservative.on { background: var(--blue-bg);  color: var(--blue);  border-color: var(--blue-bdr); }
+  .stog.base.on         { background: var(--green-bg); color: var(--green); border-color: var(--green-bdr); }
+  .stog.aggressive.on   { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-bdr); }
+  .scenario-toggle { display: flex; gap: 6px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 14px; font-size: 12px; color: var(--text2); }
+  .leg-item { display: flex; align-items: center; gap: 6px; }
+  .leg-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .table-wrap { overflow-x: auto; margin-bottom: 2rem; background: var(--bg2); border-radius: var(--radius-lg); border: 0.5px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 620px; }
+  th { padding: 10px 12px; text-align: right; color: var(--text3); font-weight: 600; border-bottom: 0.5px solid var(--border2); font-size: 10px; background: var(--bg3); text-transform: uppercase; letter-spacing: 0.05em; }
+  th:first-child { text-align: left; }
+  td { padding: 9px 12px; text-align: right; border-bottom: 0.5px solid var(--border); color: var(--text2); }
+  td:first-child { text-align: left; font-weight: 500; color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+  tr.year-sep td { border-top: 1px solid var(--border2); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .pos  { color: var(--green) !important; font-weight: 600; }
+  .neg  { color: var(--red)   !important; font-weight: 600; }
+  .h75  { color: var(--blue)  !important; font-weight: 700; }
+  .h10k { color: var(--green) !important; font-weight: 700; }
+  .model-note { background: var(--bg2); border-left: 2px solid var(--green); border-radius: 0 var(--radius) var(--radius) 0; padding: 12px 16px; font-size: 12px; color: var(--text2); margin-bottom: 1.75rem; line-height: 1.7; }
+  .target-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 2rem; }
+  .target-card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; }
+  .target-card.featured { border-color: var(--green-bdr); background: var(--green-bg); }
+  .target-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); margin-bottom: 10px; }
+  .target-val  { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -0.03em; margin-bottom: 3px; }
+  .target-sub  { font-size: 12px; color: var(--text2); margin-bottom: 14px; }
+  .target-row  { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 0.5px solid var(--border); font-size: 12px; }
+  .target-row:last-child { border-bottom: none; }
+  .tk { color: var(--text2); }
+  .tv { font-weight: 600; color: var(--text); }
+  .tv.green { color: var(--green); }
+  .tv.blue  { color: var(--blue); }
+  .tv.amber { color: var(--amber); }
+  .slider-section { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; }
+  .slider-row { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .slider-row:last-child { margin-bottom: 0; }
+  .slider-label { font-size: 12px; color: var(--text2); min-width: 155px; }
+  .slider-val   { font-size: 14px; font-weight: 700; min-width: 60px; color: var(--green); text-align: right; }
+  input[type=range] { flex: 1; appearance: none; height: 3px; background: var(--bg4); border-radius: 99px; outline: none; cursor: pointer; }
+  input[type=range]::-webkit-slider-thumb { appearance: none; width: 17px; height: 17px; background: var(--green); border-radius: 50%; cursor: pointer; border: 2px solid var(--bg); transition: transform 0.1s; }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  .result-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(145px,1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .result-card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px; }
+  .result-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 7px; }
+  .result-val   { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+  .result-sub   { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .prog-section { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; }
+  .prog-row   { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .prog-row:last-child { margin-bottom: 0; }
+  .prog-label { min-width: 72px; font-size: 12px; color: var(--text2); font-weight: 500; }
+  .prog-bg    { flex:1; height:22px; background:var(--bg4); border-radius:99px; overflow:hidden; }
+  .prog-fill  { height:100%; border-radius:99px; display:flex; align-items:center; padding-left:12px; font-size:11px; font-weight:700; transition:width 0.3s; white-space:nowrap; overflow:hidden; color: #0a0a0a; }
+  .prog-val   { min-width:90px; text-align:right; font-weight:600; font-size:12px; }
+  .table-key  { font-size:11px; color:var(--text3); margin-top:0.5rem; }
+  @media(max-width:640px){ .scenario-row,.target-grid{ grid-template-columns:1fr; } .tabs{ width:100%; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="header-tag">Financial Model</div>
+    <h1>After-Hours Drinks</h1>
+    <p class="subtitle">Updated Apr 2026 &nbsp;·&nbsp; $66.40 commission per account / month &nbsp;·&nbsp; Fixed costs $4,800/mo &nbsp;·&nbsp; Brand commission only</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showPanel('overview',this)">Overview</button>
+    <button class="tab" onclick="showPanel('proj12',this)">12-month</button>
+    <button class="tab" onclick="showPanel('proj24',this)">24-month</button>
+    <button class="tab" onclick="showPanel('targets',this)">Targets</button>
+    <button class="tab" onclick="showPanel('calculator',this)">Calculator</button>
+    <button class="tab" onclick="showPanel('fulltable',this)">Full table</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div id="overview" class="panel visible">
+    <div class="model-note">Brand commission only: accounts × $415/mo × 16% = $66.40/account/month. Listings tracked separately per scenario (+10 conservative · +15 base · +20 aggressive per month). Fixed costs $4,800/mo.</div>
+    <p class="section-title">Baseline — Jan 2026 onward</p>
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">Current accounts</div><div class="metric-value">82</div><div class="metric-sub">Mar 2026 actual</div></div>
+      <div class="metric"><div class="metric-label">Commission Mar 26</div><div class="metric-value">$4,761</div><div class="metric-sub">Most recent actual</div></div>
+      <div class="metric"><div class="metric-label">Monthly profit</div><div class="metric-value">-$39</div><div class="metric-sub">After $4,800 fixed</div></div>
+      <div class="metric"><div class="metric-label">Per account / mo</div><div class="metric-value">$66.40</div><div class="metric-sub">$415 × 16% avg rate</div></div>
+      <div class="metric"><div class="metric-label">Gap to $8,500</div><div class="metric-value">+57 accts</div><div class="metric-sub">Need ~139 total</div></div>
+      <div class="metric"><div class="metric-label">Gap to $11,500</div><div class="metric-value">+102 accts</div><div class="metric-sub">Need ~184 total</div></div>
+    </div>
+    <p class="section-title">Jan – Mar 2026 actuals</p>
+    <div class="legend">
+      <span class="leg-item"><span class="leg-dot" style="background:#22c55e"></span>Commission</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#60a5fa"></span>Profit</span>
+      <span class="leg-item"><span class="leg-dot" style="background:rgba(239,68,68,0.55)"></span>Fixed cost floor</span>
+    </div>
+    <div class="chart-wrap" style="height:220px"><canvas id="overviewChart"></canvas></div>
+  </div>
+
+  <!-- 12 MONTH -->
+  <div id="proj12" class="panel">
+    <p class="section-title">Apr 2026 – Mar 2027</p>
+    <div class="scenario-row" id="sc12cards"></div>
+    <div class="scenario-toggle">
+      <button class="stog conservative on" onclick="toggleSc('conservative')">Conservative</button>
+      <button class="stog base on"         onclick="toggleSc('base')">Base</button>
+      <button class="stog aggressive on"   onclick="toggleSc('aggressive')">Aggressive</button>
+    </div>
+    <div class="legend">
+      <span class="leg-item"><span class="leg-dot" style="background:#60a5fa"></span>Conservative</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#22c55e"></span>Base</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#f59e0b"></span>Aggressive</span>
+      <span class="leg-item"><span class="leg-dot" style="background:rgba(239,68,68,0.5)"></span>Break-even $3,500</span>
+      <span class="leg-item"><span class="leg-dot" style="background:rgba(96,165,250,0.4)"></span>$7,500 target</span>
+      <span class="leg-item"><span class="leg-dot" style="background:rgba(34,197,94,0.4)"></span>$10,000 target</span>
+    </div>
+    <div class="chart-wrap" style="height:300px"><canvas id="chart12"></canvas></div>
+  </div>
+
+  <!-- 24 MONTH -->
+  <div id="proj24" class="panel">
+    <p class="section-title">Apr 2026 – Mar 2028</p>
+    <div class="scenario-row" id="sc24cards"></div>
+    <div class="legend">
+      <span class="leg-item"><span class="leg-dot" style="background:#52525b"></span>Actual (Jan–Mar 26)</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#60a5fa"></span>Conservative</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#22c55e"></span>Base</span>
+      <span class="leg-item"><span class="leg-dot" style="background:#f59e0b"></span>Aggressive</span>
+    </div>
+    <div class="chart-wrap" style="height:320px"><canvas id="chart24"></canvas></div>
+  </div>
+
+  <!-- TARGETS -->
+  <div id="targets" class="panel">
+
+    <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px;font-size:12px;color:var(--text2);margin-bottom:1.75rem;line-height:1.7;border-left:2px solid var(--green)">
+      Two levers, one goal. <strong style="color:var(--text)">Accounts</strong> drive base commission ($66.40/acct/mo). <strong style="color:var(--text)">Listings</strong> compound on top — confirmed $4,761 from 156 active listings = <strong style="color:var(--green)">$30.52/active listing/mo</strong>. Each new listing added (65% activation) = <strong style="color:var(--green)">$19.84 net commission/mo</strong>.
+    </div>
+
+    <!-- $7,500 TARGET -->
+    <p class="section-title">Route to $8,500 / month</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0.75rem">
+      <div style="background:var(--green-bg);border:0.5px solid var(--green-bdr);border-radius:var(--radius-lg);padding:1.1rem 1.25rem">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--green);margin-bottom:8px">Route A — accounts only</div>
+        <div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px">~139 accounts</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">+57 from today's 82 · listings held flat</div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Commission per account</span><span style="font-weight:600;color:var(--text)">$66.40/mo</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Total commission</span><span style="font-weight:600;color:var(--text)">$9,230</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--text2)">Monthly profit</span><span style="font-weight:700;color:var(--green)">$4,430</span></div>
+      </div>
+      <div style="background:var(--blue-bg);border:0.5px solid var(--blue-bdr);border-radius:var(--radius-lg);padding:1.1rem 1.25rem">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--blue);margin-bottom:8px">Route B — listings only</div>
+        <div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px">~278 active listings</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">+122 from today's 156 active · accounts held flat</div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Confirmed rate per active listing</span><span style="font-weight:600;color:var(--text)">$30.52/mo</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Total listing commission</span><span style="font-weight:600;color:var(--text)">$8,485</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--text2)">New gross listings to add</span><span style="font-weight:700;color:var(--blue)">~188 listings</span></div>
+      </div>
+    </div>
+    <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-bottom:1.75rem">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--amber);margin-bottom:10px">Route C — balanced (recommended · fastest path)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Accounts needed</div>
+          <div style="font-size:20px;font-weight:700;color:var(--text)">100</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">+18 from today · $6,640 comm</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Active listings needed</div>
+          <div style="font-size:20px;font-weight:700;color:var(--text)">~222</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">+66 from today's 156 · $1,866 comm</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Combined commission</div>
+          <div style="font-size:20px;font-weight:700;color:var(--green)">$8,506</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">Profit: $3,706/mo</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);font-size:12px;color:var(--text2)">
+        Time at base rates: <strong style="color:var(--text)">~5 months</strong> (+4 accts/mo · +15 listings/mo gross at 65% activation)
+      </div>
+    </div>
+
+    <!-- $11,500 TARGET -->
+    <p class="section-title">Route to $11,500 / month</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0.75rem">
+      <div style="background:var(--green-bg);border:0.5px solid var(--green-bdr);border-radius:var(--radius-lg);padding:1.1rem 1.25rem">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--green);margin-bottom:8px">Route A — accounts only</div>
+        <div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px">~184 accounts</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">+102 from today's 82 · listings held flat</div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Commission per account</span><span style="font-weight:600;color:var(--text)">$66.40/mo</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Total commission</span><span style="font-weight:600;color:var(--text)">$12,218</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--text2)">Monthly profit</span><span style="font-weight:700;color:var(--green)">$7,418</span></div>
+      </div>
+      <div style="background:var(--blue-bg);border:0.5px solid var(--blue-bdr);border-radius:var(--radius-lg);padding:1.1rem 1.25rem">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--blue);margin-bottom:8px">Route B — listings only</div>
+        <div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px">~377 active listings</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">+221 from today's 156 active · accounts held flat</div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Confirmed rate per active listing</span><span style="font-weight:600;color:var(--text)">$30.52/mo</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Total listing commission</span><span style="font-weight:600;color:var(--text)">$11,506</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--text2)">New gross listings to add</span><span style="font-weight:700;color:var(--blue)">~340 listings</span></div>
+      </div>
+    </div>
+    <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-bottom:1.75rem">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--amber);margin-bottom:10px">Route C — balanced (recommended · fastest path)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Accounts needed</div>
+          <div style="font-size:20px;font-weight:700;color:var(--text)">140</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">+58 from today · $9,296 comm</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Active listings needed</div>
+          <div style="font-size:20px;font-weight:700;color:var(--text)">~223</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">+67 from today's 156 · $2,205 comm</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Combined commission</div>
+          <div style="font-size:20px;font-weight:700;color:var(--green)">$11,501</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">Profit: $6,701/mo</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);font-size:12px;color:var(--text2)">
+        Time at base rates: <strong style="color:var(--text)">~15 months</strong> (+4 accts/mo · +15 listings/mo gross at 65% activation)
+      </div>
+    </div>
+
+    <!-- TIME COMPARISON -->
+    <p class="section-title">Time comparison — all routes</p>
+    <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:1rem">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:480px">
+        <thead>
+          <tr>
+            <th style="padding:10px 14px;text-align:left;background:var(--bg3);color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border-bottom:0.5px solid var(--border2)">Route</th>
+            <th style="padding:10px 14px;text-align:center;background:var(--bg3);color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border-bottom:0.5px solid var(--border2)">To $8,500</th>
+            <th style="padding:10px 14px;text-align:center;background:var(--bg3);color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border-bottom:0.5px solid var(--border2)">To $11,500</th>
+            <th style="padding:10px 14px;text-align:left;background:var(--bg3);color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border-bottom:0.5px solid var(--border2)">What to focus on</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:0.5px solid var(--border)">
+            <td style="padding:9px 14px;color:var(--text);font-weight:500">Accounts only</td>
+            <td style="padding:9px 14px;text-align:center;color:var(--amber);font-weight:600">~14 months</td>
+            <td style="padding:9px 14px;text-align:center;color:var(--amber);font-weight:600">~26 months</td>
+            <td style="padding:9px 14px;color:var(--text2)">New venue acquisition</td>
+          </tr>
+          <tr style="border-bottom:0.5px solid var(--border)">
+            <td style="padding:9px 14px;color:var(--text);font-weight:500">Listings only</td>
+            <td style="padding:9px 14px;text-align:center;color:var(--amber);font-weight:600">~13 months</td>
+            <td style="padding:9px 14px;text-align:center;color:var(--amber);font-weight:600">~23 months</td>
+            <td style="padding:9px 14px;color:var(--text2)">Deeper penetration per venue</td>
+          </tr>
+          <tr>
+            <td style="padding:9px 14px;color:var(--green);font-weight:600">Balanced (both)</td>
+            <td style="padding:9px 14px;text-align:center;color:var(--green);font-weight:700">~5 months</td>
+            <td style="padding:9px 14px;text-align:center;color:var(--green);font-weight:700">~15 months</td>
+            <td style="padding:9px 14px;color:var(--text2)">New accounts + listings per account</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- CALCULATOR -->
+  <div id="calculator" class="panel">
+    <p class="section-title">Build your own scenario</p>
+    <div class="slider-section">
+      <div class="slider-row">
+        <span class="slider-label">Accounts</span>
+        <input type="range" min="60" max="260" value="82" step="1" id="slAccts" oninput="calc()">
+        <span class="slider-val" id="outAccts">82</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">Avg revenue / account ($)</span>
+        <input type="range" min="250" max="600" value="415" step="1" id="slRev" oninput="calc()">
+        <span class="slider-val" id="outRev">$415</span>
+      </div>
+      <div class="slider-row">
+        <span class="slider-label">Commission rate (%)</span>
+        <input type="range" min="10" max="20" value="16" step="0.5" id="slRate" oninput="calc()">
+        <span class="slider-val" id="outRate">16.0%</span>
+      </div>
+    </div>
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="result-label">Brand commission</div>
+        <div class="result-val" id="resBrand" style="color:#22c55e">$4,761</div>
+        <div class="result-sub" id="resBrandSub">82 × $415 × 16%</div>
+      </div>
+      <div class="result-card">
+        <div class="result-label">Monthly profit</div>
+        <div class="result-val" id="resProfit" style="color:#ef4444">-$39</div>
+        <div class="result-sub">after $3,500 fixed costs</div>
+      </div>
+    </div>
+    <p class="section-title">Progress to targets</p>
+    <div class="prog-section">
+      <div class="prog-row">
+        <span class="prog-label">$8,500</span>
+        <div class="prog-bg"><div class="prog-fill" id="prog7500" style="width:56%;background:#60a5fa">56%</div></div>
+        <span class="prog-val" id="prog7500val" style="color:#ef4444">$3,739 to go</span>
+      </div>
+      <div class="prog-row">
+        <span class="prog-label">$11,500</span>
+        <div class="prog-bg"><div class="prog-fill" id="prog10000" style="width:41%;background:#60a5fa">41%</div></div>
+        <span class="prog-val" id="prog10000val" style="color:#ef4444">$6,739 to go</span>
+      </div>
+    </div>
+    <div class="chart-wrap" style="height:240px"><canvas id="calcChart"></canvas></div>
+  </div>
+
+  <!-- FULL TABLE -->
+  <div id="fulltable" class="panel">
+    <p class="section-title">Full monthly projection</p>
+    <div class="scenario-toggle" style="margin-bottom:1.25rem">
+      <button class="stog conservative" onclick="buildTable('conservative',this)">Conservative</button>
+      <button class="stog base on"      onclick="buildTable('base',this)">Base</button>
+      <button class="stog aggressive"   onclick="buildTable('aggressive',this)">Aggressive</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:left">Month</th>
+            <th>Accounts</th>
+            <th>Listings</th>
+            <th>Sales revenue</th>
+            <th>Commission</th>
+            <th>Profit</th>
+            <th>Cumul. profit</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <p class="table-key">
+      <span style="color:#60a5fa;font-weight:700">Blue</span> = $8,500 reached &nbsp;·&nbsp;
+      <span style="color:#22c55e;font-weight:700">Green</span> = $11,500 reached
+    </p>
+  </div>
+
+</div>
+<script>
+const actuals = [
+  {m:'Jan 26',accounts:82,listings:304,rev:32669,comm:5292,profit:492},
+  {m:'Feb 26',accounts:82,listings:314,rev:28585,comm:4488,profit:-312},
+  {m:'Mar 26',accounts:82,listings:324,rev:29946,comm:4761,profit:-39}
+];
+const fixedCost  = 4800;
+const revPerAcct = 415;
+const baseRate   = 0.16;
+const seasonIdx  = [
+  0.89,0.93,0.88,0.94,0.85,0.97,1.07,1.14,1.21,0.96,0.84,0.88,
+  0.89,0.93,0.88,0.94,0.85,0.97,1.07,1.14,1.21,0.96,0.84,0.88
+];
+const projMonths = [
+  'Apr 26','May 26','Jun 26','Jul 26','Aug 26','Sep 26','Oct 26','Nov 26','Dec 26','Jan 27','Feb 27','Mar 27',
+  'Apr 27','May 27','Jun 27','Jul 27','Aug 27','Sep 27','Oct 27','Nov 27','Dec 27','Jan 28','Feb 28','Mar 28'
+];
+const scenarios = {
+  conservative: {acctGrowth:2, rateAdj:0,     listGrowth:10},
+  base:         {acctGrowth:4, rateAdj:0.002, listGrowth:15},
+  aggressive:   {acctGrowth:7, rateAdj:0.005, listGrowth:20}
+};
+function buildProj(key,months){
+  const sc=scenarios[key]; let accts=82,listings=324;
+  return Array.from({length:months},(_,i)=>{
+    accts+=sc.acctGrowth; listings+=sc.listGrowth;
+    const rate=Math.min(baseRate+sc.rateAdj*(i+1),0.20);
+    const rev=Math.round(accts*revPerAcct*seasonIdx[i]);
+    const comm=Math.round(rev*rate);
+    return{m:projMonths[i],accounts:Math.round(accts),listings:Math.round(listings),rev,comm,profit:comm-fixedCost};
+  });
+}
+const proj={
+  conservative:buildProj('conservative',24),
+  base:buildProj('base',24),
+  aggressive:buildProj('aggressive',24)
+};
+function fmt(n){return(n<0?'-':'')+'$'+Math.abs(Math.round(n)).toLocaleString();}
+function sumF(arr,k){return arr.reduce((s,r)=>s+r[k],0);}
+
+function fillScCards(elId,months){
+  const el=document.getElementById(elId);
+  const defs=[
+    {key:'conservative',cls:'conservative',label:'Conservative',desc:'+2 accounts/mo · +10 listings/mo'},
+    {key:'base',        cls:'base',        label:'Base',        desc:'+4 accounts/mo · +15 listings/mo'},
+    {key:'aggressive',  cls:'aggressive',  label:'Aggressive',  desc:'+7 accounts/mo · +20 listings/mo'}
+  ];
+  el.innerHTML=defs.map(d=>{
+    const p=proj[d.key].slice(0,months);
+    const eA=82+scenarios[d.key].acctGrowth*months;
+    const eL=324+scenarios[d.key].listGrowth*months;
+    const h10=p.findIndex(r=>r.comm>=11500);
+    const h75=p.findIndex(r=>r.comm>=8500);
+    const ms=h10>=0?'$11.5k hit: '+p[h10].m:h75>=0?'$8.5k hit: '+p[h75].m:'Neither target in period';
+    const mc=(h10>=0||h75>=0)?'':' miss';
+    return`<div class="sc-card ${d.cls}">
+      <div class="sc-label">${d.label}</div>
+      <div class="sc-val">${fmt(sumF(p,'comm'))}</div><div class="sc-sub">Total commission</div>
+      <div class="sc-divider"></div>
+      <div class="sc-val">${fmt(sumF(p,'profit'))}</div><div class="sc-sub">Total profit</div>
+      <div class="sc-divider"></div>
+      <div class="sc-sub">${d.desc}</div>
+      <div class="sc-sub" style="margin-top:3px">Ends: ${eA} accts · ${eL} listings</div>
+      <div class="sc-milestone${mc}">${ms}</div>
+    </div>`;
+  }).join('');
+}
+fillScCards('sc12cards',12);
+fillScCards('sc24cards',24);
+
+const activeS={conservative:true,base:true,aggressive:true};
+let c12,c24,cCalc;
+const gridOpts={color:'rgba(255,255,255,0.04)'};
+const tickOpts={color:'#52525b'};
+
+function toggleSc(key){
+  activeS[key]=!activeS[key];
+  document.querySelectorAll('.stog.'+key).forEach(b=>b.classList.toggle('on',activeS[key]));
+  drawC12();
+}
+function showPanel(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  btn.classList.add('active');
+  if(id==='proj12')drawC12();
+  if(id==='proj24')drawC24();
+  if(id==='calculator'){initCalc();calc();}
+  if(id==='fulltable')buildTable('base');
+}
+
+new Chart(document.getElementById('overviewChart'),{
+  type:'bar',
+  data:{labels:actual2026.map(r=>r.m),datasets:[
+    {label:'Commission',data:actual2026.map(r=>r.comm),backgroundColor:'rgba(34,197,94,0.25)',borderColor:'#22c55e',borderWidth:1.5,borderRadius:4},
+    {label:'Profit',data:actual2026.map(r=>r.profit),backgroundColor:'rgba(96,165,250,0.2)',borderColor:'#60a5fa',borderWidth:1.5,borderRadius:4},
+    {label:'Fixed',data:Array(3).fill(4800),type:'line',borderColor:'rgba(239,68,68,0.5)',borderDash:[4,4],pointRadius:0,borderWidth:1.5}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{y:{ticks:{callback:v=>'$'+v/1000+'k',...tickOpts},grid:gridOpts,border:{color:'transparent'}},
+            x:{ticks:{...tickOpts,font:{size:12}},grid:{display:false},border:{color:'transparent'}}}}
+});
+
+function drawC12(){
+  const labels=projMonths.slice(0,12);
+  const cols={conservative:'#60a5fa',base:'#22c55e',aggressive:'#f59e0b'};
+  const ds=[];
+  ['conservative','base','aggressive'].forEach(k=>{
+    if(activeS[k])ds.push({data:proj[k].slice(0,12).map(r=>r.comm),borderColor:cols[k],backgroundColor:cols[k].replace(')',',0.06)').replace('rgb','rgba'),tension:0.35,fill:false,pointRadius:3,pointBackgroundColor:cols[k],borderWidth:2});
+  });
+  ds.push({data:Array(12).fill(4800),borderColor:'rgba(239,68,68,0.45)',borderDash:[4,4],pointRadius:0,borderWidth:1.5});
+  ds.push({data:Array(12).fill(8500),borderColor:'rgba(96,165,250,0.35)',borderDash:[2,5],pointRadius:0,borderWidth:1.5});
+  ds.push({data:Array(12).fill(11500),borderColor:'rgba(34,197,94,0.35)',borderDash:[2,5],pointRadius:0,borderWidth:1.5});
+  if(c12)c12.destroy();
+  c12=new Chart(document.getElementById('chart12'),{type:'line',data:{labels,datasets:ds},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{ticks:{callback:v=>'$'+v/1000+'k',...tickOpts},grid:gridOpts,border:{color:'transparent'}},
+              x:{ticks:{maxRotation:45,font:{size:11},...tickOpts,autoSkip:false},grid:{display:false},border:{color:'transparent'}}}}});
+}
+
+function drawC24(){
+  const aL=actual2026.map(r=>r.m);
+  const all=[...aL,...projMonths];
+  const pad=Array(aL.length).fill(null);
+  const cols={conservative:'#60a5fa',base:'#22c55e',aggressive:'#f59e0b'};
+  const ds=[{data:[...actual2026.map(r=>r.comm),...Array(24).fill(null)],borderColor:'#52525b',pointRadius:4,pointBackgroundColor:'#52525b',tension:0.3,fill:false,borderWidth:2}];
+  ['conservative','base','aggressive'].forEach(k=>{
+    ds.push({data:[...pad,...proj[k].map(r=>r.comm)],borderColor:cols[k],borderDash:[4,3],pointRadius:0,tension:0.35,fill:false,borderWidth:2});
+  });
+  ds.push({data:Array(all.length).fill(4800),borderColor:'rgba(239,68,68,0.4)',borderDash:[4,4],pointRadius:0,borderWidth:1.5});
+  ds.push({data:Array(all.length).fill(8500),borderColor:'rgba(96,165,250,0.3)',borderDash:[2,5],pointRadius:0,borderWidth:1.5});
+  ds.push({data:Array(all.length).fill(11500),borderColor:'rgba(34,197,94,0.3)',borderDash:[2,5],pointRadius:0,borderWidth:1.5});
+  if(c24)c24.destroy();
+  c24=new Chart(document.getElementById('chart24'),{type:'line',data:{labels:all,datasets:ds},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{ticks:{callback:v=>'$'+v/1000+'k',...tickOpts},grid:gridOpts,border:{color:'transparent'}},
+              x:{ticks:{maxRotation:55,font:{size:10},...tickOpts,autoSkip:true,maxTicksLimit:18},grid:{display:false},border:{color:'transparent'}}}}});
+}
+
+function initCalc(){
+  if(cCalc)return;
+  cCalc=new Chart(document.getElementById('calcChart'),{type:'bar',
+    data:{labels:['Brand commission','Fixed costs','Profit'],
+      datasets:[{data:[4621,3500,1121],
+        backgroundColor:['rgba(34,197,94,0.25)','rgba(239,68,68,0.18)','rgba(96,165,250,0.2)'],
+        borderColor:['#22c55e','rgba(239,68,68,0.5)','#60a5fa'],borderWidth:1.5,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{ticks:{callback:v=>'$'+v/1000+'k',...tickOpts},grid:gridOpts,border:{color:'transparent'}},
+              x:{grid:{display:false},ticks:{...tickOpts},border:{color:'transparent'}}}}});
+}
+
+function calc(){
+  const a=parseInt(document.getElementById('slAccts').value);
+  const r=parseInt(document.getElementById('slRev').value);
+  const rt=parseFloat(document.getElementById('slRate').value)/100;
+  document.getElementById('outAccts').textContent=a;
+  document.getElementById('outRev').textContent='$'+r;
+  document.getElementById('outRate').textContent=(rt*100).toFixed(1)+'%';
+  const brand=Math.round(a*r*rt);
+  const profit=brand-fixedCost;
+  document.getElementById('resBrand').textContent=fmt(brand);
+  document.getElementById('resBrand').style.color=brand>=11500?'#22c55e':brand>=8500?'#60a5fa':'#22c55e';
+  document.getElementById('resBrandSub').textContent=a+' × $'+r+' × '+(rt*100).toFixed(1)+'%';
+  document.getElementById('resProfit').textContent=fmt(profit);
+  document.getElementById('resProfit').style.color=profit>=0?'#22c55e':'#ef4444';
+  const p7=Math.min(100,Math.round(brand/8500*100));
+  const p10=Math.min(100,Math.round(brand/11500*100));
+  const e7=document.getElementById('prog7500');
+  e7.style.width=p7+'%'; e7.style.background=brand>=8500?'#22c55e':'#60a5fa'; e7.textContent=p7+'%';
+  document.getElementById('prog7500val').textContent=brand>=8500?'Reached!':fmt(8500-brand)+' to go';
+  document.getElementById('prog7500val').style.color=brand>=8500?'#22c55e':'#ef4444';
+  const e10=document.getElementById('prog10000');
+  e10.style.width=p10+'%'; e10.style.background=brand>=11500?'#22c55e':'#60a5fa'; e10.textContent=p10+'%';
+  document.getElementById('prog10000val').textContent=brand>=11500?'Reached!':fmt(11500-brand)+' to go';
+  document.getElementById('prog10000val').style.color=brand>=11500?'#22c55e':'#ef4444';
+  if(cCalc){cCalc.data.datasets[0].data=[brand,fixedCost,Math.max(0,profit)];cCalc.update();}
+}
+
+function buildTable(key,btn){
+  document.querySelectorAll('#fulltable .stog').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  else document.querySelector('#fulltable .stog.base').classList.add('on');
+  const rows=proj[key]; let cum=0;
+  const aRows=actuals.map(r=>{
+    cum+=r.profit;
+    return`<tr><td>${r.m}</td><td>${r.accounts}</td><td>${r.listings}</td><td>${fmt(r.rev)}</td><td>${fmt(r.comm)}</td><td class="${r.profit>=0?'pos':'neg'}">${fmt(r.profit)}</td><td class="pos">${fmt(cum)}</td></tr>`;
+  });
+  const pRows=rows.map((r,i)=>{
+    cum+=r.profit;
+    const yc=i===12?' year-sep':'';
+    const cc=r.comm>=11500?' h10k':r.comm>=8500?' h75':'';
+    return`<tr class="${yc}"><td>${r.m} ›</td><td>${r.accounts}</td><td>${r.listings}</td><td>${fmt(r.rev)}</td><td class="${cc}">${fmt(r.comm)}</td><td class="${r.profit>=0?'pos':'neg'}">${fmt(r.profit)}</td><td class="${cum>=0?'pos':'neg'}">${fmt(cum)}</td></tr>`;
+  });
+  document.getElementById('tableBody').innerHTML=aRows.join('')+pRows.join('');
+}
+buildTable('base');
+</script>
+</body>
+</html>
