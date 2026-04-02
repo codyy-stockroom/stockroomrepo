@@ -462,9 +462,12 @@
           <button onclick="custToggleForm()" style="background:transparent;color:#a1a1aa;font-size:13px;padding:8px 14px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.13);cursor:pointer;font-family:inherit">Cancel</button>
         </div>
       </div>
-      <div id="cust-list"></div>
+      <div id="cust-list"><div style="text-align:center;padding:2.5rem 1rem;background:#111;border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;color:#52525b;font-size:13px">No customers yet — click <strong style="color:#22c55e">+ New customer</strong> to get started.</div></div>
     </div>
   </div>
+
+</div>
+</div>
 <script>
 const actuals = [
   {m:'Jan 26',accounts:118,listings:291,rev:42394,comm:5122,profit:1622},
@@ -566,7 +569,7 @@ function showPanel(id,btn){
   if(id==='proj24')    drawC24();
   if(id==='calculator'){initCalc();calc();}
   if(id==='fulltable') buildTable('base');
-  if(id==='customers') custRender();
+  if(id==='customers') setTimeout(custRender, 50);
 }
 
 let cOverview;
@@ -829,7 +832,6 @@ function custRender() {
 document.addEventListener('DOMContentLoaded', function() {
   buildTable('base');
   initOverviewChart();
-  custRender();
 });
 </script>
 </body>
