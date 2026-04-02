@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>After-Hours Drinks — Financial Model</title>
+<title>Stockroom Sales Agency — Financial Model</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,7 +41,8 @@
   .tab:hover { color: var(--text); }
   .tab.active { background: var(--bg3); color: var(--text); font-weight: 500; border: 0.5px solid var(--border2); }
   .panel { display: none; }
-  .panel.visible { display: block; }
+  .panel.visible { display: block; animation: fadeIn 0.15s ease; }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
   .section-title { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
   .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px,1fr)); gap: 10px; margin-bottom: 2rem; }
   .metric { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px; }
@@ -120,7 +121,34 @@
   .prog-fill  { height:100%; border-radius:99px; display:flex; align-items:center; padding-left:12px; font-size:11px; font-weight:700; transition:width 0.3s; white-space:nowrap; overflow:hidden; color: #0a0a0a; }
   .prog-val   { min-width:90px; text-align:right; font-weight:600; font-size:12px; }
   .table-key  { font-size:11px; color:var(--text3); margin-top:0.5rem; }
-  @media(max-width:640px){ .scenario-row,.target-grid{ grid-template-columns:1fr; } .tabs{ width:100%; } }
+  .cust-card { background:var(--bg2); border:0.5px solid var(--border); border-radius:var(--radius-lg); margin-bottom:8px; overflow:hidden; transition:border-color 0.15s; }
+  .cust-card:hover { border-color:var(--border2); }
+  .cust-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; cursor:pointer; gap:12px; }
+  .cust-header-left { display:flex; align-items:center; gap:14px; flex:1; min-width:0; }
+  .cust-num { font-size:11px; font-weight:600; color:var(--text3); min-width:24px; }
+  .cust-name { font-size:14px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cust-meta { font-size:11px; color:var(--text3); margin-top:2px; }
+  .cust-badges { display:flex; gap:6px; align-items:center; flex-shrink:0; }
+  .badge-listings { background:var(--blue-bg); color:var(--blue); border:0.5px solid var(--blue-bdr); font-size:11px; font-weight:600; padding:3px 9px; border-radius:99px; white-space:nowrap; }
+  .badge-spend { background:var(--green-bg); color:var(--green); border:0.5px solid var(--green-bdr); font-size:11px; font-weight:600; padding:3px 9px; border-radius:99px; white-space:nowrap; }
+  .cust-chevron { color:var(--text3); font-size:12px; transition:transform 0.2s; }
+  .cust-chevron.open { transform:rotate(180deg); }
+  .cust-body { display:none; border-top:0.5px solid var(--border); padding:14px 16px; }
+  .cust-body.open { display:block; }
+  .product-list { margin-bottom:12px; }
+  .product-item { display:flex; align-items:center; justify-content:space-between; padding:7px 0; border-bottom:0.5px solid var(--border); font-size:13px; }
+  .product-item:last-child { border-bottom:none; }
+  .product-name { color:var(--text2); }
+  .product-actions { display:flex; gap:6px; }
+  .btn-sm { font-size:11px; padding:3px 9px; border-radius:var(--radius); border:0.5px solid var(--border2); background:transparent; color:var(--text3); cursor:pointer; font-family:inherit; transition:all 0.15s; }
+  .btn-sm:hover { color:var(--text); border-color:var(--border2); background:var(--bg3); }
+  .btn-sm.danger:hover { color:var(--red); border-color:rgba(239,68,68,0.3); }
+  .add-product-row { display:flex; gap:8px; margin-top:10px; }
+  .add-product-row input { flex:1; background:var(--bg3); border:0.5px solid var(--border2); border-radius:var(--radius); color:var(--text); font-size:12px; padding:7px 10px; font-family:inherit; outline:none; }
+  .cust-edit-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:10px; }
+  .cust-edit-row input { background:var(--bg3); border:0.5px solid var(--border2); border-radius:var(--radius); color:var(--text); font-size:12px; padding:7px 10px; font-family:inherit; outline:none; width:100%; }
+  .cust-actions { display:flex; gap:6px; padding-top:10px; border-top:0.5px solid var(--border); margin-top:4px; }
+  @media(max-width:640px){ .scenario-row,.target-grid{ grid-template-columns:1fr; } .tabs{ width:100%; } .cust-edit-row{ grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
@@ -128,8 +156,8 @@
 
   <header>
     <div class="header-tag">Financial Model</div>
-    <h1>After-Hours Drinks</h1>
-    <p class="subtitle">Updated Apr 2026 &nbsp;·&nbsp; $66.40 commission per account / month &nbsp;·&nbsp; Fixed costs $4,800/mo &nbsp;·&nbsp; Brand commission only</p>
+    <h1>Stockroom Sales Agency</h1>
+    <p class="subtitle">Updated Apr 2026 &nbsp;·&nbsp; $52.20 commission per account / month &nbsp;·&nbsp; Fixed costs $3,500/mo &nbsp;·&nbsp; Brand commission only</p>
   </header>
 
   <div class="tabs">
@@ -139,19 +167,20 @@
     <button class="tab" onclick="showPanel('targets',this)">Targets</button>
     <button class="tab" onclick="showPanel('calculator',this)">Calculator</button>
     <button class="tab" onclick="showPanel('fulltable',this)">Full table</button>
+    <button class="tab" onclick="showPanel('customers',this)">Customers</button>
   </div>
 
   <!-- OVERVIEW -->
   <div id="overview" class="panel visible">
-    <div class="model-note">Brand commission only: accounts × $415/mo × 16% = $66.40/account/month. Listings tracked separately per scenario (+10 conservative · +15 base · +20 aggressive per month). Fixed costs $4,800/mo.</div>
+    <div class="model-note">Brand commission only: accounts × $348/mo × 15% = $52.20/account/month. Listings tracked separately per scenario (+10 conservative · +15 base · +20 aggressive per month). Fixed costs $3,500/mo.</div>
     <p class="section-title">Baseline — Jan 2026 onward</p>
     <div class="metrics">
-      <div class="metric"><div class="metric-label">Current accounts</div><div class="metric-value">82</div><div class="metric-sub">Mar 2026 actual</div></div>
-      <div class="metric"><div class="metric-label">Commission Mar 26</div><div class="metric-value">$4,761</div><div class="metric-sub">Most recent actual</div></div>
-      <div class="metric"><div class="metric-label">Monthly profit</div><div class="metric-value">-$39</div><div class="metric-sub">After $4,800 fixed</div></div>
-      <div class="metric"><div class="metric-label">Per account / mo</div><div class="metric-value">$66.40</div><div class="metric-sub">$415 × 16% avg rate</div></div>
-      <div class="metric"><div class="metric-label">Gap to $8,500</div><div class="metric-value">+57 accts</div><div class="metric-sub">Need ~139 total</div></div>
-      <div class="metric"><div class="metric-label">Gap to $11,500</div><div class="metric-value">+102 accts</div><div class="metric-sub">Need ~184 total</div></div>
+      <div class="metric"><div class="metric-label">Current accounts</div><div class="metric-value">118</div><div class="metric-sub">Mar 2026 actual</div></div>
+      <div class="metric"><div class="metric-label">Commission Mar 26</div><div class="metric-value">$4,621</div><div class="metric-sub">Most recent actual</div></div>
+      <div class="metric"><div class="metric-label">Monthly profit</div><div class="metric-value">$1,121</div><div class="metric-sub">After $3,500 fixed</div></div>
+      <div class="metric"><div class="metric-label">Per account / mo</div><div class="metric-value">$52.20</div><div class="metric-sub">$348 × 15% avg rate</div></div>
+      <div class="metric"><div class="metric-label">Gap to $7,500</div><div class="metric-value">+54 accts</div><div class="metric-sub">Need ~172 total</div></div>
+      <div class="metric"><div class="metric-label">Gap to $10,000</div><div class="metric-value">+102 accts</div><div class="metric-sub">Need ~220 total</div></div>
     </div>
     <p class="section-title">Jan – Mar 2026 actuals</p>
     <div class="legend">
@@ -199,27 +228,27 @@
   <div id="targets" class="panel">
 
     <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px;font-size:12px;color:var(--text2);margin-bottom:1.75rem;line-height:1.7;border-left:2px solid var(--green)">
-      Two levers, one goal. <strong style="color:var(--text)">Accounts</strong> drive base commission ($66.40/acct/mo). <strong style="color:var(--text)">Listings</strong> compound on top — confirmed $4,761 from 156 active listings = <strong style="color:var(--green)">$30.52/active listing/mo</strong>. Each new listing added (65% activation) = <strong style="color:var(--green)">$19.84 net commission/mo</strong>.
+      Two levers, one goal. <strong style="color:var(--text)">Accounts</strong> drive base commission ($52.20/acct/mo). <strong style="color:var(--text)">Listings</strong> compound on top — confirmed $4,820 from 190 active listings = <strong style="color:var(--green)">$25.37/active listing/mo</strong>. Each new listing added (65% activation) = <strong style="color:var(--green)">$16.49 net commission/mo</strong>.
     </div>
 
     <!-- $7,500 TARGET -->
-    <p class="section-title">Route to $8,500 / month</p>
+    <p class="section-title">Route to $7,500 / month</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0.75rem">
       <div style="background:var(--green-bg);border:0.5px solid var(--green-bdr);border-radius:var(--radius-lg);padding:1.1rem 1.25rem">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--green);margin-bottom:8px">Route A — accounts only</div>
-        <div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px">~139 accounts</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">+57 from today's 82 · listings held flat</div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Commission per account</span><span style="font-weight:600;color:var(--text)">$66.40/mo</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Total commission</span><span style="font-weight:600;color:var(--text)">$9,230</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--text2)">Monthly profit</span><span style="font-weight:700;color:var(--green)">$4,430</span></div>
+        <div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px">~172 accounts</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">+54 from today's 118 · listings held flat</div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Commission per account</span><span style="font-weight:600;color:var(--text)">$52.20/mo</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Total commission</span><span style="font-weight:600;color:var(--text)">$7,478</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--text2)">Monthly profit</span><span style="font-weight:700;color:var(--green)">$3,978</span></div>
       </div>
       <div style="background:var(--blue-bg);border:0.5px solid var(--blue-bdr);border-radius:var(--radius-lg);padding:1.1rem 1.25rem">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--blue);margin-bottom:8px">Route B — listings only</div>
-        <div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px">~278 active listings</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">+122 from today's 156 active · accounts held flat</div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Confirmed rate per active listing</span><span style="font-weight:600;color:var(--text)">$30.52/mo</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Total listing commission</span><span style="font-weight:600;color:var(--text)">$8,485</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--text2)">New gross listings to add</span><span style="font-weight:700;color:var(--blue)">~188 listings</span></div>
+        <div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px">~296 active listings</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">+106 from today's 190 active · accounts held flat</div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Confirmed rate per active listing</span><span style="font-weight:600;color:var(--text)">$25.37/mo</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Total listing commission</span><span style="font-weight:600;color:var(--text)">$7,510</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--text2)">New gross listings to add</span><span style="font-weight:700;color:var(--blue)">~163 listings</span></div>
       </div>
     </div>
     <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-bottom:1.75rem">
@@ -227,43 +256,43 @@
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
         <div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Accounts needed</div>
-          <div style="font-size:20px;font-weight:700;color:var(--text)">100</div>
-          <div style="font-size:11px;color:var(--text2);margin-top:2px">+18 from today · $6,640 comm</div>
+          <div style="font-size:20px;font-weight:700;color:var(--text)">130</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">+12 from today · $6,786 comm</div>
         </div>
         <div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Active listings needed</div>
-          <div style="font-size:20px;font-weight:700;color:var(--text)">~222</div>
-          <div style="font-size:11px;color:var(--text2);margin-top:2px">+66 from today's 156 · $1,866 comm</div>
+          <div style="font-size:20px;font-weight:700;color:var(--text)">~218</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">+28 from today's 190 · $714 comm</div>
         </div>
         <div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Combined commission</div>
-          <div style="font-size:20px;font-weight:700;color:var(--green)">$8,506</div>
-          <div style="font-size:11px;color:var(--text2);margin-top:2px">Profit: $3,706/mo</div>
+          <div style="font-size:20px;font-weight:700;color:var(--green)">$7,500</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">Profit: $4,000/mo</div>
         </div>
       </div>
       <div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);font-size:12px;color:var(--text2)">
-        Time at base rates: <strong style="color:var(--text)">~5 months</strong> (+4 accts/mo · +15 listings/mo gross at 65% activation)
+        Time at base rates: <strong style="color:var(--text)">~3 months</strong> (+4 accts/mo · +15 listings/mo gross at 65% activation)
       </div>
     </div>
 
-    <!-- $11,500 TARGET -->
-    <p class="section-title">Route to $11,500 / month</p>
+    <!-- $10,000 TARGET -->
+    <p class="section-title">Route to $10,000 / month</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0.75rem">
       <div style="background:var(--green-bg);border:0.5px solid var(--green-bdr);border-radius:var(--radius-lg);padding:1.1rem 1.25rem">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--green);margin-bottom:8px">Route A — accounts only</div>
-        <div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px">~184 accounts</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">+102 from today's 82 · listings held flat</div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Commission per account</span><span style="font-weight:600;color:var(--text)">$66.40/mo</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Total commission</span><span style="font-weight:600;color:var(--text)">$12,218</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--text2)">Monthly profit</span><span style="font-weight:700;color:var(--green)">$7,418</span></div>
+        <div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px">~220 accounts</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">+102 from today's 118 · listings held flat</div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Commission per account</span><span style="font-weight:600;color:var(--text)">$52.20/mo</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Total commission</span><span style="font-weight:600;color:var(--text)">$11,484</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--text2)">Monthly profit</span><span style="font-weight:700;color:var(--green)">$7,984</span></div>
       </div>
       <div style="background:var(--blue-bg);border:0.5px solid var(--blue-bdr);border-radius:var(--radius-lg);padding:1.1rem 1.25rem">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--blue);margin-bottom:8px">Route B — listings only</div>
-        <div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px">~377 active listings</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">+221 from today's 156 active · accounts held flat</div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Confirmed rate per active listing</span><span style="font-weight:600;color:var(--text)">$30.52/mo</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Total listing commission</span><span style="font-weight:600;color:var(--text)">$11,506</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--text2)">New gross listings to add</span><span style="font-weight:700;color:var(--blue)">~340 listings</span></div>
+        <div style="font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px">~394 active listings</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">+204 from today's 190 active · accounts held flat</div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Confirmed rate per active listing</span><span style="font-weight:600;color:var(--text)">$25.37/mo</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:12px"><span style="color:var(--text2)">Total listing commission</span><span style="font-weight:600;color:var(--text)">$9,996</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px"><span style="color:var(--text2)">New gross listings to add</span><span style="font-weight:700;color:var(--blue)">~314 listings</span></div>
       </div>
     </div>
     <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-bottom:1.75rem">
@@ -271,22 +300,22 @@
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
         <div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Accounts needed</div>
-          <div style="font-size:20px;font-weight:700;color:var(--text)">140</div>
-          <div style="font-size:11px;color:var(--text2);margin-top:2px">+58 from today · $9,296 comm</div>
+          <div style="font-size:20px;font-weight:700;color:var(--text)">160</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">+42 from today · $8,352 comm</div>
         </div>
         <div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Active listings needed</div>
-          <div style="font-size:20px;font-weight:700;color:var(--text)">~223</div>
-          <div style="font-size:11px;color:var(--text2);margin-top:2px">+67 from today's 156 · $2,205 comm</div>
+          <div style="font-size:20px;font-weight:700;color:var(--text)">~255</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">+65 from today's 190 · $1,649 comm</div>
         </div>
         <div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Combined commission</div>
-          <div style="font-size:20px;font-weight:700;color:var(--green)">$11,501</div>
-          <div style="font-size:11px;color:var(--text2);margin-top:2px">Profit: $6,701/mo</div>
+          <div style="font-size:20px;font-weight:700;color:var(--green)">$10,001</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">Profit: $6,501/mo</div>
         </div>
       </div>
       <div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);font-size:12px;color:var(--text2)">
-        Time at base rates: <strong style="color:var(--text)">~15 months</strong> (+4 accts/mo · +15 listings/mo gross at 65% activation)
+        Time at base rates: <strong style="color:var(--text)">~11 months</strong> (+4 accts/mo · +15 listings/mo gross at 65% activation)
       </div>
     </div>
 
@@ -297,8 +326,8 @@
         <thead>
           <tr>
             <th style="padding:10px 14px;text-align:left;background:var(--bg3);color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border-bottom:0.5px solid var(--border2)">Route</th>
-            <th style="padding:10px 14px;text-align:center;background:var(--bg3);color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border-bottom:0.5px solid var(--border2)">To $8,500</th>
-            <th style="padding:10px 14px;text-align:center;background:var(--bg3);color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border-bottom:0.5px solid var(--border2)">To $11,500</th>
+            <th style="padding:10px 14px;text-align:center;background:var(--bg3);color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border-bottom:0.5px solid var(--border2)">To $7,500</th>
+            <th style="padding:10px 14px;text-align:center;background:var(--bg3);color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border-bottom:0.5px solid var(--border2)">To $10,000</th>
             <th style="padding:10px 14px;text-align:left;background:var(--bg3);color:var(--text3);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border-bottom:0.5px solid var(--border2)">What to focus on</th>
           </tr>
         </thead>
@@ -311,14 +340,14 @@
           </tr>
           <tr style="border-bottom:0.5px solid var(--border)">
             <td style="padding:9px 14px;color:var(--text);font-weight:500">Listings only</td>
-            <td style="padding:9px 14px;text-align:center;color:var(--amber);font-weight:600">~13 months</td>
-            <td style="padding:9px 14px;text-align:center;color:var(--amber);font-weight:600">~23 months</td>
+            <td style="padding:9px 14px;text-align:center;color:var(--amber);font-weight:600">~11 months</td>
+            <td style="padding:9px 14px;text-align:center;color:var(--amber);font-weight:600">~21 months</td>
             <td style="padding:9px 14px;color:var(--text2)">Deeper penetration per venue</td>
           </tr>
           <tr>
             <td style="padding:9px 14px;color:var(--green);font-weight:600">Balanced (both)</td>
-            <td style="padding:9px 14px;text-align:center;color:var(--green);font-weight:700">~5 months</td>
-            <td style="padding:9px 14px;text-align:center;color:var(--green);font-weight:700">~15 months</td>
+            <td style="padding:9px 14px;text-align:center;color:var(--green);font-weight:700">~3 months</td>
+            <td style="padding:9px 14px;text-align:center;color:var(--green);font-weight:700">~11 months</td>
             <td style="padding:9px 14px;color:var(--text2)">New accounts + listings per account</td>
           </tr>
         </tbody>
@@ -333,43 +362,43 @@
     <div class="slider-section">
       <div class="slider-row">
         <span class="slider-label">Accounts</span>
-        <input type="range" min="60" max="260" value="82" step="1" id="slAccts" oninput="calc()">
-        <span class="slider-val" id="outAccts">82</span>
+        <input type="range" min="100" max="260" value="118" step="1" id="slAccts" oninput="calc()">
+        <span class="slider-val" id="outAccts">118</span>
       </div>
       <div class="slider-row">
         <span class="slider-label">Avg revenue / account ($)</span>
-        <input type="range" min="250" max="600" value="415" step="1" id="slRev" oninput="calc()">
-        <span class="slider-val" id="outRev">$415</span>
+        <input type="range" min="250" max="500" value="348" step="1" id="slRev" oninput="calc()">
+        <span class="slider-val" id="outRev">$348</span>
       </div>
       <div class="slider-row">
         <span class="slider-label">Commission rate (%)</span>
-        <input type="range" min="10" max="20" value="16" step="0.5" id="slRate" oninput="calc()">
-        <span class="slider-val" id="outRate">16.0%</span>
+        <input type="range" min="10" max="20" value="15" step="0.5" id="slRate" oninput="calc()">
+        <span class="slider-val" id="outRate">15.0%</span>
       </div>
     </div>
     <div class="result-grid">
       <div class="result-card">
         <div class="result-label">Brand commission</div>
-        <div class="result-val" id="resBrand" style="color:#22c55e">$4,761</div>
-        <div class="result-sub" id="resBrandSub">82 × $415 × 16%</div>
+        <div class="result-val" id="resBrand" style="color:#22c55e">$4,621</div>
+        <div class="result-sub" id="resBrandSub">118 × $348 × 15%</div>
       </div>
       <div class="result-card">
         <div class="result-label">Monthly profit</div>
-        <div class="result-val" id="resProfit" style="color:#ef4444">-$39</div>
+        <div class="result-val" id="resProfit" style="color:#22c55e">$1,121</div>
         <div class="result-sub">after $3,500 fixed costs</div>
       </div>
     </div>
     <p class="section-title">Progress to targets</p>
     <div class="prog-section">
       <div class="prog-row">
-        <span class="prog-label">$8,500</span>
-        <div class="prog-bg"><div class="prog-fill" id="prog7500" style="width:56%;background:#60a5fa">56%</div></div>
-        <span class="prog-val" id="prog7500val" style="color:#ef4444">$3,739 to go</span>
+        <span class="prog-label">$7,500</span>
+        <div class="prog-bg"><div class="prog-fill" id="prog7500" style="width:62%;background:#22c55e">62%</div></div>
+        <span class="prog-val" id="prog7500val" style="color:#ef4444">$2,879 to go</span>
       </div>
       <div class="prog-row">
-        <span class="prog-label">$11,500</span>
-        <div class="prog-bg"><div class="prog-fill" id="prog10000" style="width:41%;background:#60a5fa">41%</div></div>
-        <span class="prog-val" id="prog10000val" style="color:#ef4444">$6,739 to go</span>
+        <span class="prog-label">$10,000</span>
+        <div class="prog-bg"><div class="prog-fill" id="prog10000" style="width:46%;background:#22c55e">46%</div></div>
+        <span class="prog-val" id="prog10000val" style="color:#ef4444">$5,379 to go</span>
       </div>
     </div>
     <div class="chart-wrap" style="height:240px"><canvas id="calcChart"></canvas></div>
@@ -400,21 +429,62 @@
       </table>
     </div>
     <p class="table-key">
-      <span style="color:#60a5fa;font-weight:700">Blue</span> = $8,500 reached &nbsp;·&nbsp;
-      <span style="color:#22c55e;font-weight:700">Green</span> = $11,500 reached
+      <span style="color:#60a5fa;font-weight:700">Blue</span> = $7,500 reached &nbsp;·&nbsp;
+      <span style="color:#22c55e;font-weight:700">Green</span> = $10,000 reached
     </p>
+  <!-- CUSTOMERS -->
+  <div id="customers" class="panel">
+    <div id="cust-root">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px">
+        <p class="section-title" style="margin-bottom:0">Customer breakdown</p>
+        <button id="newCustBtn" onclick="custToggleForm()" style="background:#22c55e;color:#000;font-weight:700;font-size:13px;padding:9px 20px;border-radius:8px;border:none;cursor:pointer;font-family:inherit">+ New customer</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.5rem">
+        <div class="metric"><div class="metric-label">Total customers</div><div class="metric-value" id="cm-total">0</div></div>
+        <div class="metric"><div class="metric-label">Total listings</div><div class="metric-value" id="cm-list">0</div></div>
+        <div class="metric"><div class="metric-label">Avg listings</div><div class="metric-value" id="cm-avg">0</div></div>
+        <div class="metric"><div class="metric-label">Total spend /mo</div><div class="metric-value" id="cm-spend">$0</div></div>
+      </div>
+      <div id="cust-form" style="display:none;background:#111;border:0.5px solid rgba(34,197,94,0.3);border-radius:12px;padding:1.25rem;margin-bottom:1.25rem">
+        <p style="font-size:11px;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px">New customer</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div><label style="font-size:11px;color:#52525b;display:block;margin-bottom:5px;text-transform:uppercase">Venue name *</label>
+          <input id="cf-name" type="text" placeholder="The Grill Auckland" style="width:100%;background:#1a1a1a;border:0.5px solid rgba(255,255,255,0.13);border-radius:8px;color:#fff;font-size:13px;padding:8px 12px;font-family:inherit;outline:none"></div>
+          <div><label style="font-size:11px;color:#52525b;display:block;margin-bottom:5px;text-transform:uppercase">Onboard date *</label>
+          <input id="cf-date" type="month" style="width:100%;background:#1a1a1a;border:0.5px solid rgba(255,255,255,0.13);border-radius:8px;color:#fff;font-size:13px;padding:8px 12px;font-family:inherit;outline:none"></div>
+          <div><label style="font-size:11px;color:#52525b;display:block;margin-bottom:5px;text-transform:uppercase">Monthly spend ($)</label>
+          <input id="cf-spend" type="number" placeholder="420" min="0" style="width:100%;background:#1a1a1a;border:0.5px solid rgba(255,255,255,0.13);border-radius:8px;color:#fff;font-size:13px;padding:8px 12px;font-family:inherit;outline:none"></div>
+          <div><label style="font-size:11px;color:#52525b;display:block;margin-bottom:5px;text-transform:uppercase">Location</label>
+          <input id="cf-loc" type="text" placeholder="Ponsonby, Auckland" style="width:100%;background:#1a1a1a;border:0.5px solid rgba(255,255,255,0.13);border-radius:8px;color:#fff;font-size:13px;padding:8px 12px;font-family:inherit;outline:none"></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="custSaveNew()" style="background:#22c55e;color:#000;font-weight:700;font-size:13px;padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-family:inherit">Save customer</button>
+          <button onclick="custToggleForm()" style="background:transparent;color:#a1a1aa;font-size:13px;padding:8px 14px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.13);cursor:pointer;font-family:inherit">Cancel</button>
+        </div>
+      </div>
+      <div id="cust-list"></div>
+    </div>
   </div>
-
-</div>
 <script>
 const actuals = [
-  {m:'Jan 26',accounts:82,listings:304,rev:32669,comm:5292,profit:492},
-  {m:'Feb 26',accounts:82,listings:314,rev:28585,comm:4488,profit:-312},
-  {m:'Mar 26',accounts:82,listings:324,rev:29946,comm:4761,profit:-39}
+  {m:'Jan 26',accounts:118,listings:291,rev:42394,comm:5122,profit:1622},
+  {m:'Feb 26',accounts:118,listings:291,rev:38004,comm:4607,profit:1107},
+  {m:'Mar 26',accounts:118,listings:291,rev:40917,comm:4621,profit:1121}
 ];
-const fixedCost  = 4800;
-const revPerAcct = 415;
-const baseRate   = 0.16;
+const actualHistory = [
+  {m:'Apr 25',accounts:120,rev:33950,comm:4590,profit:1090},
+  {m:'May 25',accounts:124,rev:37796,comm:4975,profit:1475},
+  {m:'Jun 25',accounts:128,rev:33890,comm:4690,profit:1190},
+  {m:'Jul 25',accounts:132,rev:40579,comm:4663,profit:1163},
+  {m:'Aug 25',accounts:142,rev:35577,comm:4203,profit:703},
+  {m:'Sep 25',accounts:148,rev:41648,comm:6060,profit:2560},
+  {m:'Oct 25',accounts:151,rev:46732,comm:5801,profit:2301},
+  {m:'Nov 25',accounts:135,rev:49545,comm:7142,profit:3642},
+  {m:'Dec 25',accounts:133,rev:54054,comm:7034,profit:3534},
+];
+const fixedCost  = 3500;
+const revPerAcct = 348;
+const baseRate   = 0.15;
 const seasonIdx  = [
   0.89,0.93,0.88,0.94,0.85,0.97,1.07,1.14,1.21,0.96,0.84,0.88,
   0.89,0.93,0.88,0.94,0.85,0.97,1.07,1.14,1.21,0.96,0.84,0.88
@@ -429,7 +499,7 @@ const scenarios = {
   aggressive:   {acctGrowth:7, rateAdj:0.005, listGrowth:20}
 };
 function buildProj(key,months){
-  const sc=scenarios[key]; let accts=82,listings=324;
+  const sc=scenarios[key]; let accts=118,listings=291;
   return Array.from({length:months},(_,i)=>{
     accts+=sc.acctGrowth; listings+=sc.listGrowth;
     const rate=Math.min(baseRate+sc.rateAdj*(i+1),0.20);
@@ -455,11 +525,11 @@ function fillScCards(elId,months){
   ];
   el.innerHTML=defs.map(d=>{
     const p=proj[d.key].slice(0,months);
-    const eA=82+scenarios[d.key].acctGrowth*months;
-    const eL=324+scenarios[d.key].listGrowth*months;
-    const h10=p.findIndex(r=>r.comm>=11500);
-    const h75=p.findIndex(r=>r.comm>=8500);
-    const ms=h10>=0?'$11.5k hit: '+p[h10].m:h75>=0?'$8.5k hit: '+p[h75].m:'Neither target in period';
+    const eA=118+scenarios[d.key].acctGrowth*months;
+    const eL=291+scenarios[d.key].listGrowth*months;
+    const h10=p.findIndex(r=>r.comm>=10000);
+    const h75=p.findIndex(r=>r.comm>=7500);
+    const ms=h10>=0?'$10k hit: '+p[h10].m:h75>=0?'$7.5k hit: '+p[h75].m:'Neither target in period';
     const mc=(h10>=0||h75>=0)?'':' miss';
     return`<div class="sc-card ${d.cls}">
       <div class="sc-label">${d.label}</div>
@@ -491,23 +561,29 @@ function showPanel(id,btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('visible');
   btn.classList.add('active');
-  if(id==='proj12')drawC12();
-  if(id==='proj24')drawC24();
+  if(id==='overview')  initOverviewChart();
+  if(id==='proj12')    drawC12();
+  if(id==='proj24')    drawC24();
   if(id==='calculator'){initCalc();calc();}
-  if(id==='fulltable')buildTable('base');
+  if(id==='fulltable') buildTable('base');
+  if(id==='customers') custRender();
 }
 
-new Chart(document.getElementById('overviewChart'),{
-  type:'bar',
-  data:{labels:actual2026.map(r=>r.m),datasets:[
-    {label:'Commission',data:actual2026.map(r=>r.comm),backgroundColor:'rgba(34,197,94,0.25)',borderColor:'#22c55e',borderWidth:1.5,borderRadius:4},
-    {label:'Profit',data:actual2026.map(r=>r.profit),backgroundColor:'rgba(96,165,250,0.2)',borderColor:'#60a5fa',borderWidth:1.5,borderRadius:4},
-    {label:'Fixed',data:Array(3).fill(4800),type:'line',borderColor:'rgba(239,68,68,0.5)',borderDash:[4,4],pointRadius:0,borderWidth:1.5}
-  ]},
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-    scales:{y:{ticks:{callback:v=>'$'+v/1000+'k',...tickOpts},grid:gridOpts,border:{color:'transparent'}},
-            x:{ticks:{...tickOpts,font:{size:12}},grid:{display:false},border:{color:'transparent'}}}}
-});
+let cOverview;
+function initOverviewChart(){
+  if(cOverview) return;
+  cOverview = new Chart(document.getElementById('overviewChart'),{
+    type:'bar',
+    data:{labels:actuals.map(r=>r.m),datasets:[
+      {label:'Commission',data:actuals.map(r=>r.comm),backgroundColor:'rgba(34,197,94,0.25)',borderColor:'#22c55e',borderWidth:1.5,borderRadius:4},
+      {label:'Profit',data:actuals.map(r=>r.profit),backgroundColor:'rgba(96,165,250,0.2)',borderColor:'#60a5fa',borderWidth:1.5,borderRadius:4},
+      {label:'Fixed',data:Array(actuals.length).fill(fixedCost),type:'line',borderColor:'rgba(239,68,68,0.5)',borderDash:[4,4],pointRadius:0,borderWidth:1.5}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{ticks:{callback:v=>'$'+v/1000+'k',...tickOpts},grid:gridOpts,border:{color:'transparent'}},
+              x:{ticks:{...tickOpts,font:{size:12}},grid:{display:false},border:{color:'transparent'}}}}
+  });
+}
 
 function drawC12(){
   const labels=projMonths.slice(0,12);
@@ -516,9 +592,9 @@ function drawC12(){
   ['conservative','base','aggressive'].forEach(k=>{
     if(activeS[k])ds.push({data:proj[k].slice(0,12).map(r=>r.comm),borderColor:cols[k],backgroundColor:cols[k].replace(')',',0.06)').replace('rgb','rgba'),tension:0.35,fill:false,pointRadius:3,pointBackgroundColor:cols[k],borderWidth:2});
   });
-  ds.push({data:Array(12).fill(4800),borderColor:'rgba(239,68,68,0.45)',borderDash:[4,4],pointRadius:0,borderWidth:1.5});
-  ds.push({data:Array(12).fill(8500),borderColor:'rgba(96,165,250,0.35)',borderDash:[2,5],pointRadius:0,borderWidth:1.5});
-  ds.push({data:Array(12).fill(11500),borderColor:'rgba(34,197,94,0.35)',borderDash:[2,5],pointRadius:0,borderWidth:1.5});
+  ds.push({data:Array(12).fill(3500),borderColor:'rgba(239,68,68,0.45)',borderDash:[4,4],pointRadius:0,borderWidth:1.5});
+  ds.push({data:Array(12).fill(7500),borderColor:'rgba(96,165,250,0.35)',borderDash:[2,5],pointRadius:0,borderWidth:1.5});
+  ds.push({data:Array(12).fill(10000),borderColor:'rgba(34,197,94,0.35)',borderDash:[2,5],pointRadius:0,borderWidth:1.5});
   if(c12)c12.destroy();
   c12=new Chart(document.getElementById('chart12'),{type:'line',data:{labels,datasets:ds},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
@@ -535,9 +611,9 @@ function drawC24(){
   ['conservative','base','aggressive'].forEach(k=>{
     ds.push({data:[...pad,...proj[k].map(r=>r.comm)],borderColor:cols[k],borderDash:[4,3],pointRadius:0,tension:0.35,fill:false,borderWidth:2});
   });
-  ds.push({data:Array(all.length).fill(4800),borderColor:'rgba(239,68,68,0.4)',borderDash:[4,4],pointRadius:0,borderWidth:1.5});
-  ds.push({data:Array(all.length).fill(8500),borderColor:'rgba(96,165,250,0.3)',borderDash:[2,5],pointRadius:0,borderWidth:1.5});
-  ds.push({data:Array(all.length).fill(11500),borderColor:'rgba(34,197,94,0.3)',borderDash:[2,5],pointRadius:0,borderWidth:1.5});
+  ds.push({data:Array(all.length).fill(3500),borderColor:'rgba(239,68,68,0.4)',borderDash:[4,4],pointRadius:0,borderWidth:1.5});
+  ds.push({data:Array(all.length).fill(7500),borderColor:'rgba(96,165,250,0.3)',borderDash:[2,5],pointRadius:0,borderWidth:1.5});
+  ds.push({data:Array(all.length).fill(10000),borderColor:'rgba(34,197,94,0.3)',borderDash:[2,5],pointRadius:0,borderWidth:1.5});
   if(c24)c24.destroy();
   c24=new Chart(document.getElementById('chart24'),{type:'line',data:{labels:all,datasets:ds},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
@@ -567,20 +643,20 @@ function calc(){
   const brand=Math.round(a*r*rt);
   const profit=brand-fixedCost;
   document.getElementById('resBrand').textContent=fmt(brand);
-  document.getElementById('resBrand').style.color=brand>=11500?'#22c55e':brand>=8500?'#60a5fa':'#22c55e';
+  document.getElementById('resBrand').style.color=brand>=10000?'#22c55e':brand>=7500?'#60a5fa':'#22c55e';
   document.getElementById('resBrandSub').textContent=a+' × $'+r+' × '+(rt*100).toFixed(1)+'%';
   document.getElementById('resProfit').textContent=fmt(profit);
   document.getElementById('resProfit').style.color=profit>=0?'#22c55e':'#ef4444';
-  const p7=Math.min(100,Math.round(brand/8500*100));
-  const p10=Math.min(100,Math.round(brand/11500*100));
+  const p7=Math.min(100,Math.round(brand/7500*100));
+  const p10=Math.min(100,Math.round(brand/10000*100));
   const e7=document.getElementById('prog7500');
-  e7.style.width=p7+'%'; e7.style.background=brand>=8500?'#22c55e':'#60a5fa'; e7.textContent=p7+'%';
-  document.getElementById('prog7500val').textContent=brand>=8500?'Reached!':fmt(8500-brand)+' to go';
-  document.getElementById('prog7500val').style.color=brand>=8500?'#22c55e':'#ef4444';
+  e7.style.width=p7+'%'; e7.style.background=brand>=7500?'#22c55e':'#60a5fa'; e7.textContent=p7+'%';
+  document.getElementById('prog7500val').textContent=brand>=7500?'Reached!':fmt(7500-brand)+' to go';
+  document.getElementById('prog7500val').style.color=brand>=7500?'#22c55e':'#ef4444';
   const e10=document.getElementById('prog10000');
-  e10.style.width=p10+'%'; e10.style.background=brand>=11500?'#22c55e':'#60a5fa'; e10.textContent=p10+'%';
-  document.getElementById('prog10000val').textContent=brand>=11500?'Reached!':fmt(11500-brand)+' to go';
-  document.getElementById('prog10000val').style.color=brand>=11500?'#22c55e':'#ef4444';
+  e10.style.width=p10+'%'; e10.style.background=brand>=10000?'#22c55e':'#60a5fa'; e10.textContent=p10+'%';
+  document.getElementById('prog10000val').textContent=brand>=10000?'Reached!':fmt(10000-brand)+' to go';
+  document.getElementById('prog10000val').style.color=brand>=10000?'#22c55e':'#ef4444';
   if(cCalc){cCalc.data.datasets[0].data=[brand,fixedCost,Math.max(0,profit)];cCalc.update();}
 }
 
@@ -596,12 +672,165 @@ function buildTable(key,btn){
   const pRows=rows.map((r,i)=>{
     cum+=r.profit;
     const yc=i===12?' year-sep':'';
-    const cc=r.comm>=11500?' h10k':r.comm>=8500?' h75':'';
+    const cc=r.comm>=10000?' h10k':r.comm>=7500?' h75':'';
     return`<tr class="${yc}"><td>${r.m} ›</td><td>${r.accounts}</td><td>${r.listings}</td><td>${fmt(r.rev)}</td><td class="${cc}">${fmt(r.comm)}</td><td class="${r.profit>=0?'pos':'neg'}">${fmt(r.profit)}</td><td class="${cum>=0?'pos':'neg'}">${fmt(cum)}</td></tr>`;
   });
   document.getElementById('tableBody').innerHTML=aRows.join('')+pRows.join('');
 }
 buildTable('base');
+
+const STORAGE_KEY = 'stockroom_customers_v1';
+
+function custLoad() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e) { return []; }
+}
+function custSave(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+function custToggleForm() {
+  var f = document.getElementById('cust-form');
+  if (!f) return;
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  if (f.style.display === 'block') document.getElementById('cf-name').focus();
+}
+function custSaveNew() {
+  var name  = (document.getElementById('cf-name').value  || '').trim();
+  var date  = (document.getElementById('cf-date').value  || '').trim();
+  var spend = parseFloat(document.getElementById('cf-spend').value) || 0;
+  var loc   = (document.getElementById('cf-loc').value   || '').trim();
+  if (!name) { alert('Please enter a venue name.'); return; }
+  if (!date) { alert('Please select an onboard date.'); return; }
+  var customers = custLoad();
+  customers.push({ id: Date.now(), name: name, date: date, spend: spend, location: loc, products: [] });
+  customers.sort(function(a,b){ return a.date < b.date ? -1 : 1; });
+  custSave(customers);
+  document.getElementById('cf-name').value  = '';
+  document.getElementById('cf-date').value  = '';
+  document.getElementById('cf-spend').value = '';
+  document.getElementById('cf-loc').value   = '';
+  document.getElementById('cust-form').style.display = 'none';
+  custRender();
+}
+function custDelete(id) {
+  if (!confirm('Delete this customer?')) return;
+  custSave(custLoad().filter(function(c){ return c.id !== id; }));
+  custRender();
+}
+function custSaveEdits(id) {
+  var customers = custLoad();
+  var c = customers.find(function(x){ return x.id === id; });
+  if (!c) return;
+  c.name     = document.getElementById('ce-name-'+id).value.trim() || c.name;
+  c.spend    = parseFloat(document.getElementById('ce-spend-'+id).value) || c.spend;
+  c.location = document.getElementById('ce-loc-'+id).value.trim();
+  custSave(customers);
+  custRender();
+  setTimeout(function(){ custOpen(id); }, 30);
+}
+function custAddProduct(id) {
+  var input = document.getElementById('cp-input-'+id);
+  var name = input ? input.value.trim() : '';
+  if (!name) return;
+  var customers = custLoad();
+  var c = customers.find(function(x){ return x.id === id; });
+  if (!c) return;
+  c.products.push({ id: Date.now(), name: name });
+  custSave(customers);
+  custRender();
+  setTimeout(function(){ custOpen(id); }, 30);
+}
+function custDelProduct(cid, pid) {
+  var customers = custLoad();
+  var c = customers.find(function(x){ return x.id === cid; });
+  if (!c) return;
+  c.products = c.products.filter(function(p){ return p.id !== pid; });
+  custSave(customers);
+  custRender();
+  setTimeout(function(){ custOpen(cid); }, 30);
+}
+function custOpen(id) {
+  var body = document.getElementById('cb-'+id);
+  var chev = document.getElementById('ch-'+id);
+  if (!body) return;
+  var isOpen = body.style.display === 'block';
+  document.querySelectorAll('[id^="cb-"]').forEach(function(el){ el.style.display='none'; });
+  document.querySelectorAll('[id^="ch-"]').forEach(function(el){ el.textContent='▼'; });
+  if (!isOpen) { body.style.display = 'block'; if(chev) chev.textContent = '▲'; }
+}
+function custFmtDate(ym) {
+  if (!ym) return '';
+  var parts = ym.split('-');
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return months[parseInt(parts[1])-1] + ' ' + parts[0];
+}
+function custRender() {
+  var el = document.getElementById('cust-list');
+  if (!el) return;
+  var customers = custLoad();
+  var tot = document.getElementById('cm-total');
+  var tli = document.getElementById('cm-list');
+  var avg = document.getElementById('cm-avg');
+  var spn = document.getElementById('cm-spend');
+  var totalList = customers.reduce(function(s,c){ return s+c.products.length; }, 0);
+  var avgList   = customers.length ? (totalList/customers.length).toFixed(1) : '0';
+  var totSpend  = customers.reduce(function(s,c){ return s+(c.spend||0); }, 0);
+  if(tot) tot.textContent = customers.length;
+  if(tli) tli.textContent = totalList;
+  if(avg) avg.textContent = avgList;
+  if(spn) spn.textContent = '$'+Math.round(totSpend).toLocaleString();
+  if (customers.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:2.5rem 1rem;background:#111;border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;color:#52525b;font-size:13px">No customers yet — click <strong style="color:#22c55e">+ New customer</strong> to get started.</div>';
+    return;
+  }
+  el.innerHTML = customers.map(function(c,i) {
+    var prods = c.products.length === 0
+      ? '<p style="font-size:12px;color:#52525b;padding:6px 0">No products listed yet.</p>'
+      : c.products.map(function(p){
+          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid rgba(255,255,255,0.07);font-size:13px">'
+            +'<span style="color:#a1a1aa">'+p.name+'</span>'
+            +'<button onclick="custDelProduct('+c.id+','+p.id+')" style="font-size:11px;padding:3px 9px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.13);background:transparent;color:#71717a;cursor:pointer;font-family:inherit">Remove</button>'
+            +'</div>';
+        }).join('');
+    return '<div style="background:#111;border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;margin-bottom:8px;overflow:hidden">'
+      +'<div onclick="custOpen('+c.id+')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;gap:12px">'
+        +'<div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0">'
+          +'<span style="font-size:11px;font-weight:600;color:#52525b;min-width:20px">'+(i+1)+'</span>'
+          +'<div><div style="font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+c.name+'</div>'
+          +'<div style="font-size:11px;color:#71717a;margin-top:2px">'+custFmtDate(c.date)+(c.location ? ' · '+c.location : '')+'</div></div>'
+        +'</div>'
+        +'<div style="display:flex;gap:6px;align-items:center;flex-shrink:0">'
+          +'<span style="background:rgba(96,165,250,0.1);color:#60a5fa;border:0.5px solid rgba(96,165,250,0.25);font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px">'+c.products.length+' listing'+(c.products.length!==1?'s':'')+'</span>'
+          +'<span style="background:rgba(34,197,94,0.1);color:#22c55e;border:0.5px solid rgba(34,197,94,0.25);font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px">$'+Math.round(c.spend||0).toLocaleString()+'/mo</span>'
+          +'<span id="ch-'+c.id+'" style="color:#52525b;font-size:12px">▼</span>'
+        +'</div>'
+      +'</div>'
+      +'<div id="cb-'+c.id+'" style="display:none;border-top:0.5px solid rgba(255,255,255,0.07);padding:14px 16px">'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">'
+          +'<input id="ce-name-'+c.id+'" type="text" value="'+c.name+'" placeholder="Venue name" style="background:#1a1a1a;border:0.5px solid rgba(255,255,255,0.13);border-radius:8px;color:#fff;font-size:12px;padding:7px 10px;font-family:inherit;outline:none;width:100%">'
+          +'<input id="ce-spend-'+c.id+'" type="number" value="'+(c.spend||'')+'" placeholder="Monthly spend" style="background:#1a1a1a;border:0.5px solid rgba(255,255,255,0.13);border-radius:8px;color:#fff;font-size:12px;padding:7px 10px;font-family:inherit;outline:none;width:100%">'
+          +'<input id="ce-loc-'+c.id+'" type="text" value="'+(c.location||'')+'" placeholder="Location" style="background:#1a1a1a;border:0.5px solid rgba(255,255,255,0.13);border-radius:8px;color:#fff;font-size:12px;padding:7px 10px;font-family:inherit;outline:none;width:100%">'
+        +'</div>'
+        +'<div style="margin-bottom:10px">'+prods+'</div>'
+        +'<div style="display:flex;gap:8px;margin-bottom:10px">'
+          +'<input id="cp-input-'+c.id+'" type="text" placeholder="Add product listing..." onkeydown="if(event.key===\'Enter\')custAddProduct('+c.id+')" style="flex:1;background:#1a1a1a;border:0.5px solid rgba(255,255,255,0.13);border-radius:8px;color:#fff;font-size:12px;padding:7px 10px;font-family:inherit;outline:none">'
+          +'<button onclick="custAddProduct('+c.id+')" style="font-size:12px;padding:7px 14px;border-radius:8px;border:0.5px solid rgba(34,197,94,0.3);background:transparent;color:#22c55e;cursor:pointer;font-family:inherit;white-space:nowrap">+ Add</button>'
+        +'</div>'
+        +'<div style="display:flex;gap:6px;padding-top:10px;border-top:0.5px solid rgba(255,255,255,0.07)">'
+          +'<button onclick="custSaveEdits('+c.id+')" style="font-size:12px;padding:7px 14px;border-radius:8px;border:0.5px solid rgba(34,197,94,0.3);background:transparent;color:#22c55e;cursor:pointer;font-family:inherit">Save changes</button>'
+          +'<button onclick="custDelete('+c.id+')" style="font-size:12px;padding:7px 14px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.13);background:transparent;color:#71717a;cursor:pointer;font-family:inherit">Delete customer</button>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  buildTable('base');
+  initOverviewChart();
+  custRender();
+});
 </script>
 </body>
 </html>
